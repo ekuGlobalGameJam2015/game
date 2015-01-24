@@ -516,8 +516,6 @@ Transform:
   m_LocalScale: {x: 3.14809561, y: 3.14809585, z: 3.14809585}
   m_Children: []
   m_Father: {fileID: 0}
-<<<<<<< HEAD
-=======
   m_RootOrder: 1
 --- !u!1 &1676451697
 GameObject:
@@ -558,7 +556,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
->>>>>>> origin/master
   m_RootOrder: 2
 --- !u!1 &1750911587
 GameObject:

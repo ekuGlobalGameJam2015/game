@@ -69,7 +69,7 @@ public class World extends UnityEngine.Object {
 		queue.Enqueue(firstRoom);
 		
 		var numRooms = 1; //first room is a room
-		while(numRooms < 10 && queue.Count > 0){
+		while(numRooms < 1 && queue.Count > 0){
 			var room : Room = queue.Dequeue();
 			var available_directions : Array = available_dirs(room.pos);
 			RandomizeArray(available_directions);
@@ -205,7 +205,7 @@ public class World extends UnityEngine.Object {
 					
 					var light : GameObject = new GameObject("Light");
 					light.AddComponent(Light);
-					light.transform.position = room.pos*5;
+					light.transform.position = room.pos*5.1;
 				
 				}else if(typeof(obj) == Hallway){
 					var hallway : Hallway = obj;
@@ -214,21 +214,21 @@ public class World extends UnityEngine.Object {
 					switch(hallway.orientation()){
 						case NORTH:
 							ci.transform = Matrix4x4.TRS(
-								hallway.pos*5,
+								hallway.pos*5.1,
 								Quaternion.Euler(0,0,0),
 								Vector3(5,2,2)
 							);
 							break;
 						case EAST:
 							ci.transform = Matrix4x4.TRS(
-								hallway.pos*5,
+								hallway.pos*5.1,
 								Quaternion.Euler(0,90,0),
 								Vector3(5,2,2)
 							);
 							break;
 						case UP:
 							ci.transform = Matrix4x4.TRS(
-								hallway.pos*5,
+								hallway.pos*5.1,
 								Quaternion.Euler(0,0,90),
 								Vector3(5,2,2)
 							);
