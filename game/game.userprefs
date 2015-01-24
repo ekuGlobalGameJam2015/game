@@ -2,11 +2,11 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\world.js">
     <Files>
-      <File FileName="Assets\world.js" Line="251" Column="2" />
-      <File FileName="Assets\world.js" Line="176" Column="28" />
+      <File FileName="Assets\world.js" Line="278" Column="2" />
+      <File FileName="Assets\world.js" Line="72" Column="21" />
       <File FileName="Assets\Standard Assets\Character Controllers\Sources\Scripts\CharacterMotor.js" Line="1" Column="1" />
       <File FileName="Assets\Standard Assets\Character Controllers\Sources\Scripts\ThirdPersonController.js" Line="1" Column="1" />
-      <File FileName="Assets\HUD.js" Line="1" Column="1" />
+      <File FileName="Assets\HUD.js" Line="42" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -2,6 +2,7 @@
 import System.Collections.Generic;
 import System.Linq;
 
+
 public class Room {
 	public var connections : Array = new Array();
 	public var pos : Vector3;
@@ -29,9 +30,9 @@ public class Hallway {
 	};
 	
 	public function orientation() : int{
-		if( room1.pos.x != room2.pos.x)
-			return World.NORTH;
 		if( room1.pos.z != room2.pos.z)
+			return World.NORTH;
+		if( room1.pos.x != room2.pos.x)
 			return World.EAST;
 		if( room1.pos.y != room2.pos.y)
 			return World.UP;
@@ -48,7 +49,7 @@ public class World extends UnityEngine.Object {
 	public static var EAST : int  = 4;
 	public static var UP : int  = 2;
 	public static var DOWN : int  = 5;
-
+	
 	public var objects : Hashtable = new Hashtable();
 	
 	private function rev(dir : int) : int {
@@ -69,21 +70,23 @@ public class World extends UnityEngine.Object {
 		queue.Enqueue(firstRoom);
 		
 		var numRooms = 1; //first room is a room
-		while(numRooms < 1 && queue.Count > 0){
+		while(numRooms < 10 && queue.Count > 0){
 			var room : Room = queue.Dequeue();
 			var available_directions : Array = available_dirs(room.pos);
 			RandomizeArray(available_directions);
 			for(var dir : int in available_directions){
-				if(Random.Range(0, 4) == 0){ //don't traverse every wall
+				if(numRooms < 10 && Random.Range(0, 4) == 0){ //don't traverse every wall
 					var nextRoom : Room = make_move(dir, room);
 					queue.Enqueue(nextRoom);
 					numRooms++;
 				}
+				
 			}
 			if(available_dirs(room.pos).length > 0){ //add it back if it can be revisited
 				queue.Enqueue(room);
 			}
 		}
+		Debug.Log(objects.Values.Count);
 	};
 
 	// add hallway and next room
@@ -96,20 +99,20 @@ public class World extends UnityEngine.Object {
 		
 		switch (move){
 			case NORTH:
-				hallwayLoc = new Vector3(loc.x + 1, loc.y, loc.z);
-				nextRoomLoc = new Vector3(loc.x + 2, loc.y, loc.z);
-				break;
-			case SOUTH:
-				hallwayLoc = new Vector3(loc.x - 1, loc.y, loc.z);
-				nextRoomLoc = new Vector3(loc.x - 2, loc.y, loc.z);
-				break;
-			case EAST:
 				hallwayLoc = new Vector3(loc.x, loc.y, loc.z + 1);
 				nextRoomLoc = new Vector3(loc.x, loc.y, loc.z + 2);
 				break;
-			case WEST:
+			case SOUTH:
 				hallwayLoc = new Vector3(loc.x, loc.y, loc.z - 1);
 				nextRoomLoc = new Vector3(loc.x, loc.y, loc.z - 2);
+				break;
+			case EAST:
+				hallwayLoc = new Vector3(loc.x + 1, loc.y, loc.z);
+				nextRoomLoc = new Vector3(loc.x + 2, loc.y, loc.z);
+				break;
+			case WEST:
+				hallwayLoc = new Vector3(loc.x - 1, loc.y, loc.z);
+				nextRoomLoc = new Vector3(loc.x - 2, loc.y, loc.z);
 				break;
 			case UP:
 				hallwayLoc = new Vector3(loc.x, loc.y + 1, loc.z);
@@ -120,8 +123,11 @@ public class World extends UnityEngine.Object {
 				nextRoomLoc = new Vector3(loc.x, loc.y - 2, loc.z);
 				break;
 		}
-		
-		var nextRoom = new Room(nextRoomLoc);
+		var nextRoom : Room;
+		if(nextRoomLoc in objects.Keys)
+			nextRoom = objects[nextRoomLoc];
+		else
+			nextRoom = new Room(nextRoomLoc);
 		var hallway : Hallway = new Hallway(hallwayLoc, 1, room, nextRoom);  // default to length == 1 for now
 		
 		objects[nextRoomLoc] = nextRoom;
@@ -143,69 +149,252 @@ public class World extends UnityEngine.Object {
 		
 		switch (move){
 			case NORTH:
-				return !(  // neither the loc or the next loc is filled;
-					new Vector3(loc.x + 1, loc.y, loc.z)in objects ||
-					new Vector3(loc.x + 2, loc.y, loc.z) in objects
+				return !(
+					new Vector3(loc.x, loc.y, loc.z + 1) in objects
 				);
 				break;
 			case SOUTH:
 				return !(
-					new Vector3(loc.x - 1, loc.y, loc.z) in objects ||
-					new Vector3(loc.x - 2, loc.y, loc.z) in objects
+					new Vector3(loc.x, loc.y, loc.z - 1) in objects
 				);
 				break;
 			case EAST:
 				return !(
-					new Vector3(loc.x, loc.y, loc.z + 1) in objects ||
-					new Vector3(loc.x, loc.y, loc.z + 2) in objects
+					new Vector3(loc.x + 1, loc.y, loc.z) in objects
 				);
 				break;
 			case WEST:
 				return !(
-					new Vector3(loc.x, loc.y, loc.z - 1) in objects ||
-					new Vector3(loc.x, loc.y, loc.z - 2) in objects
+					new Vector3(loc.x - 1, loc.y, loc.z) in objects
 				);
 				break;
 			/*case UP:
 				return !(
-					new Vector3(loc.x, loc.y + 1, loc.z) in objects ||
-					new Vector3(loc.x, loc.y + 2, loc.z) in objects
+					new Vector3(loc.x, loc.y + 1, loc.z) in objects
 				);
 				break;
 			case DOWN:
 				return !(
-					new Vector3(loc.x, loc.y - 1, loc.z) in objects ||
-					new Vector3(loc.x, loc.y - 2, loc.z) in objects
+					new Vector3(loc.x, loc.y - 1, loc.z) in objects
 				);
 				break;*/
 		}
 		return false;
 	};
 	
-	public function draw(){
+	public function draw(){//room_s : GameObject, room_nsew : GameObject, room_nse : GameObject, room_se : GameObject){
 		var meshes : Array = new Array();
 		var cube : GameObject  = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		var cubeMesh : Mesh = cube.GetComponent(MeshFilter).mesh;
 		var combine = new Array();
 		
 		var ci : CombineInstance;
-
+		Debug.Log(objects.Values.Count);
+		var scale : float = 50.0;
 		for(var obj in objects.Values){
 				if(typeof(obj) == Room){
 					var room : Room = obj;
 					ci = new CombineInstance();
-					ci.mesh = Instantiate(cubeMesh);
-					ci.transform = Matrix4x4.TRS(
-						room.pos*5,
-						Quaternion.Euler(0,0,0),
-						Vector3(5,5,5)
-					);
+					var room_dirs : Array = available_dirs(room.pos);
+					var go : GameObject;
+					if(
+						!(NORTH in room_dirs) &&
+						(SOUTH in room_dirs) &&
+						(EAST in room_dirs) &&
+						(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_s,
+							room.pos*10,
+							Quaternion.Euler(0,0,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						(NORTH in room_dirs) &&
+						!(SOUTH in room_dirs) &&
+						(EAST in room_dirs) &&
+						(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_s,
+							room.pos*10,
+							Quaternion.Euler(0,180,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						(NORTH in room_dirs) &&
+						(SOUTH in room_dirs) &&
+						!(EAST in room_dirs) &&
+						(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_s,
+							room.pos*10,
+							Quaternion.Euler(0,90,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						(NORTH in room_dirs) &&
+						(SOUTH in room_dirs) &&
+						(EAST in room_dirs) &&
+						!(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_s,
+							room.pos*10,
+							Quaternion.Euler(0,270,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						(NORTH in room_dirs) &&
+						!(SOUTH in room_dirs) &&
+						!(EAST in room_dirs) &&
+						(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_se,
+							room.pos*10,
+							Quaternion.Euler(0,180,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						(NORTH in room_dirs) &&
+						!(SOUTH in room_dirs) &&
+						(EAST in room_dirs) &&
+						!(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_se,
+							room.pos*10,
+							Quaternion.Euler(0,270,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						!(NORTH in room_dirs) &&
+						(SOUTH in room_dirs) &&
+						!(EAST in room_dirs) &&
+						(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_se,
+							room.pos*10,
+							Quaternion.Euler(0,90,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						!(NORTH in room_dirs) &&
+						(SOUTH in room_dirs) &&
+						(EAST in room_dirs) &&
+						!(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_se,
+							room.pos*10,
+							Quaternion.Euler(0,0,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						!(NORTH in room_dirs) &&
+						!(SOUTH in room_dirs) &&
+						(EAST in room_dirs) &&
+						!(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_nse,
+							room.pos*10,
+							Quaternion.Euler(0,0,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						(NORTH in room_dirs) &&
+						!(SOUTH in room_dirs) &&
+						!(EAST in room_dirs) &&
+						!(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_nse,
+							room.pos*10,
+							Quaternion.Euler(0,270,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						!(NORTH in room_dirs) &&
+						!(SOUTH in room_dirs) &&
+						!(EAST in room_dirs) &&
+						(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_nse,
+							room.pos*10,
+							Quaternion.Euler(0,180,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						!(NORTH in room_dirs) &&
+						(SOUTH in room_dirs) &&
+						!(EAST in room_dirs) &&
+						!(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_nse,
+							room.pos*10,
+							Quaternion.Euler(0,90,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						!(NORTH in room_dirs) &&
+						!(SOUTH in room_dirs) &&
+						!(EAST in room_dirs) &&
+						!(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_nsew,
+							room.pos*10,
+							Quaternion.Euler(0,0,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else{
+						ci.mesh = Instantiate(cubeMesh);
+						ci.transform = Matrix4x4.TRS(
+							room.pos*10,
+							Quaternion.Euler(0,0,0),
+							Vector3(1,1,1)*10
+						);
+						Debug.Log("Could not find prefab" + room.pos + room_dirs + 
+						(NORTH in room_dirs) + (SOUTH in room_dirs) + (EAST in room_dirs) + (WEST in room_dirs));
+					}
 					combine.Push(ci);
 					
 					
 					var light : GameObject = new GameObject("Light");
 					light.AddComponent(Light);
-					light.transform.position = room.pos*5.1;
+					light.transform.position = room.pos*10;
 				
 				}else if(typeof(obj) == Hallway){
 					var hallway : Hallway = obj;
@@ -214,23 +403,23 @@ public class World extends UnityEngine.Object {
 					switch(hallway.orientation()){
 						case NORTH:
 							ci.transform = Matrix4x4.TRS(
-								hallway.pos*5.1,
+								hallway.pos*10,
 								Quaternion.Euler(0,0,0),
-								Vector3(5,2,2)
+								Vector3(2,2,5)*2
 							);
 							break;
 						case EAST:
 							ci.transform = Matrix4x4.TRS(
-								hallway.pos*5.1,
+								hallway.pos*10,
 								Quaternion.Euler(0,90,0),
-								Vector3(5,2,2)
+								Vector3(2,2,5)*2
 							);
 							break;
 						case UP:
 							ci.transform = Matrix4x4.TRS(
-								hallway.pos*5.1,
+								hallway.pos*10,
 								Quaternion.Euler(0,0,90),
-								Vector3(5,2,2)
+								Vector3(2,2,5)*2
 							);
 							break;
 						default:
@@ -268,8 +457,16 @@ public class World extends UnityEngine.Object {
 };
 
 public var world : World;
+public static var room_s : GameObject;
+public static var room_nsew : GameObject;
+public static var room_nse : GameObject;
+public static var room_se : GameObject;
 
-function Start () {
+function Start () { 
+	room_s = Resources.Load("Room_S");
+	room_nsew = Resources.Load("Room_NSEW");
+	room_nse= Resources.Load("Room_NSE");
+	room_se = Resources.Load("Room_SE");
 	world = new World();
 }
 
