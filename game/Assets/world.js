@@ -57,11 +57,8 @@ public class World extends UnityEngine.Object {
 
 
 	public function World(){
-		Debug.Log("begin");
 		generate();
-		Debug.Log("generate");
 		draw();
-		Debug.Log("draw");
 	};
 
 	public function generate() {
@@ -74,7 +71,9 @@ public class World extends UnityEngine.Object {
 		var numRooms = 1; //first room is a room
 		while(numRooms < 10 && queue.Count > 0){
 			var room : Room = queue.Dequeue();
-			for(var dir : int in available_dirs(room.pos)){
+			var available_directions : Array = available_dirs(room.pos);
+			RandomizeArray(available_directions);
+			for(var dir : int in available_directions){
 				if(Random.Range(0, 4) == 0){ //don't traverse every wall
 					var nextRoom : Room = make_move(dir, room);
 					queue.Enqueue(nextRoom);
@@ -111,6 +110,14 @@ public class World extends UnityEngine.Object {
 			case WEST:
 				hallwayLoc = new Vector3(loc.x, loc.y, loc.z - 1);
 				nextRoomLoc = new Vector3(loc.x, loc.y, loc.z - 2);
+				break;
+			case UP:
+				hallwayLoc = new Vector3(loc.x, loc.y + 1, loc.z);
+				nextRoomLoc = new Vector3(loc.x, loc.y + 2, loc.z);
+				break;
+			case DOWN:
+				hallwayLoc = new Vector3(loc.x, loc.y - 1, loc.z);
+				nextRoomLoc = new Vector3(loc.x, loc.y - 2, loc.z);
 				break;
 		}
 		
@@ -159,6 +166,18 @@ public class World extends UnityEngine.Object {
 					new Vector3(loc.x, loc.y, loc.z - 2) in objects
 				);
 				break;
+			/*case UP:
+				return !(
+					new Vector3(loc.x, loc.y + 1, loc.z) in objects ||
+					new Vector3(loc.x, loc.y + 2, loc.z) in objects
+				);
+				break;
+			case DOWN:
+				return !(
+					new Vector3(loc.x, loc.y - 1, loc.z) in objects ||
+					new Vector3(loc.x, loc.y - 2, loc.z) in objects
+				);
+				break;*/
 		}
 		return false;
 	};
@@ -170,7 +189,7 @@ public class World extends UnityEngine.Object {
 		var combine = new Array();
 		
 		var ci : CombineInstance;
-		Debug.Log(objects.Values);
+
 		for(var obj in objects.Values){
 				if(typeof(obj) == Room){
 					var room : Room = obj;
@@ -225,7 +244,6 @@ public class World extends UnityEngine.Object {
 		mesh.RecalculateNormals();
 		mesh.triangles = mesh.triangles.Reverse().ToArray(); //remove when have normal objects
 		
-		Debug.Log(mesh.vertices.Length);
 
 		var world = new GameObject("WorldGenerated", MeshFilter, MeshRenderer);
 		var mf : MeshFilter = world.GetComponent(MeshFilter);
@@ -235,14 +253,23 @@ public class World extends UnityEngine.Object {
 		
 		Destroy(cube);
 		
-		Debug.Log(world);
+	};
+	
+	//http://answers.unity3d.com/questions/16531/randomizing-arrays.html
+	static function RandomizeArray(arr : Array)
+	{
+	    for (var i = arr.length - 1; i > 0; i--) {
+	        var r = Random.Range(0,i);
+	        var tmp = arr[i];
+	        arr[i] = arr[r];
+	        arr[r] = tmp;
+	    }
 	};
 };
 
 public var world : World;
 
 function Start () {
-	Debug.Log("STart");
 	world = new World();
 }
 
