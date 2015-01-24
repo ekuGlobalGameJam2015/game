@@ -5,6 +5,8 @@ Project("{C8D46D34-1BEA-4FD5-BFF8-66A65FF8AEA9}") = "game", "Assembly-CSharp-fir
 EndProject
 Project("{C8D46D34-1BEA-4FD5-BFF8-66A65FF8AEA9}") = "game", "Assembly-UnityScript-firstpass.unityproj", "{D4FEF11C-C30A-B6D8-18E2-5F17350CBCF1}"
 EndProject
+Project("{C8D46D34-1BEA-4FD5-BFF8-66A65FF8AEA9}") = "game", "Assembly-UnityScript.unityproj", "{675B4165-6670-44F6-3857-47F64BA725EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{D4FEF11C-C30A-B6D8-18E2-5F17350CBCF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4FEF11C-C30A-B6D8-18E2-5F17350CBCF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4FEF11C-C30A-B6D8-18E2-5F17350CBCF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{675B4165-6670-44F6-3857-47F64BA725EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{675B4165-6670-44F6-3857-47F64BA725EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{675B4165-6670-44F6-3857-47F64BA725EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{675B4165-6670-44F6-3857-47F64BA725EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
