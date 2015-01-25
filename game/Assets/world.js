@@ -313,6 +313,34 @@ public class World extends UnityEngine.Object {
 						!(NORTH in room_dirs) &&
 						!(SOUTH in room_dirs) &&
 						(EAST in room_dirs) &&
+						(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_ns,
+							room.pos*10,
+							Quaternion.Euler(0,0,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						(NORTH in room_dirs) &&
+						(SOUTH in room_dirs) &&
+						!(EAST in room_dirs) &&
+						!(WEST in room_dirs)// &&
+						//(UP in room_dirs) &&
+						//(DOWN in room_dirs)
+					){
+						go = Instantiate(
+							world.room_ns,
+							room.pos*10,
+							Quaternion.Euler(0,90,0)
+						);
+						go.transform.localScale = Vector3(1,1,1)*scale;
+					}else if(
+						!(NORTH in room_dirs) &&
+						!(SOUTH in room_dirs) &&
+						(EAST in room_dirs) &&
 						!(WEST in room_dirs)// &&
 						//(UP in room_dirs) &&
 						//(DOWN in room_dirs)
@@ -396,7 +424,7 @@ public class World extends UnityEngine.Object {
 					light.AddComponent(Light);
 					light.transform.position = room.pos*10;
 				
-				}else if(typeof(obj) == Hallway){
+				}/*else if(typeof(obj) == Hallway){
 					var hallway : Hallway = obj;
 					ci = new CombineInstance();
 					ci.mesh = Instantiate(cubeMesh);
@@ -426,7 +454,7 @@ public class World extends UnityEngine.Object {
 							break;
 					}
 					combine.Push(ci);
-				}
+				}*/
 		}
 		var mesh : Mesh = new Mesh();
 		mesh.CombineMeshes(combine.ToBuiltin(CombineInstance) as CombineInstance[]);
@@ -461,12 +489,14 @@ public static var room_s : GameObject;
 public static var room_nsew : GameObject;
 public static var room_nse : GameObject;
 public static var room_se : GameObject;
+public static var room_ns : GameObject;
 
 function Start () { 
 	room_s = Resources.Load("Room_S");
 	room_nsew = Resources.Load("Room_NSEW");
 	room_nse= Resources.Load("Room_NSE");
 	room_se = Resources.Load("Room_SE");
+	room_ns = Resources.Load("Room_NS");
 	world = new World();
 }
 
